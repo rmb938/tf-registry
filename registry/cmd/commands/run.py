@@ -48,7 +48,7 @@ class RunRegistry(Command):
         parser.add_argument("--key", action=EnvDefault, envvar="HTTPS_KEY", required=False, type=argparse.FileType('r'),
                             help="The path to the TLS key")
 
-        parser.add_argument("--db-url", action=EnvDefault, envvar="DB_URL", default="sqlite:///hack/registry.db",
+        parser.add_argument("--db-url", action=EnvDefault, envvar="DB_URL", required=True,
                             type=str, help="The URL to the database to connect to")
         parser.add_argument("--db-pool-size", action=EnvDefault, envvar="DB_POOL_SIZE", default=5, type=int,
                             help="The amount of connections to make to the database")

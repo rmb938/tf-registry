@@ -1,0 +1,19 @@
+version: '2'
+
+services:
+  minio1:
+    image: minio/minio
+    volumes:
+      - minio:/export
+    ports:
+      - "9000:9000"
+    environment:
+      MINIO_ACCESS_KEY: Z4DCGH3MOP1N1GVO9146
+      MINIO_SECRET_KEY: EB5gj1VgmfmRGfnSfcM06ZPG5ah9FB9DsUEISRi0
+    command: server /export
+
+
+## By default this config uses default local driver,
+## For custom volumes replace with volume driver configuration.
+volumes:
+  minio:
