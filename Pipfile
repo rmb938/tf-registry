@@ -1,0 +1,22 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+"ingredients.http" = ">=0.0.23"
+clify = ">=0.0.3"
+cherrypy = ">=18.1.0"
+sqlalchemy = ">=1.2.18"
+alembic = ">=1.0.7"
+sqlalchemy-utils = ">=0.33.11"
+arrow = ">=0.13.1"
+
+[dev-packages]
+
+[requires]
+python_version = "3.6"
+
+[scripts]
+registry = "env PYTHONPATH=. python registry/cmd/main.py run"
+alembic = "alembic"
