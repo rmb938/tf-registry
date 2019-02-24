@@ -2,6 +2,7 @@ import enum
 import json
 
 import arrow
+import semver
 from ingredients_http.app import HTTPApplication
 
 
@@ -16,6 +17,8 @@ class Application(HTTPApplication):
                 return str(o.value)
             if isinstance(o, arrow.Arrow):
                 return o.isoformat()
+            if isinstance(o, semver.VersionInfo):
+                return str(o)
 
             return old_json_encoder(self, o)
 

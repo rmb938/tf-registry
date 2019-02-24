@@ -7,9 +7,10 @@ from ingredients_http.request_methods import RequestMethods
 from ingredients_http.route import Route
 from sqlalchemy import desc
 
-from registry.http.mounts.root.routes.api.v1.validation_models.organization import RequestCreateOrganization, \
+from registry.http.mounts.root.routes.api.v1.validation_models.organizations import RequestCreateOrganization, \
     ResponseOrganization, ParamsOrganization, ParamsListOrganization
 from registry.http.router import RegistryRouter
+from registry.sql.models.module import Module
 from registry.sql.models.organization import Organization
 
 
@@ -40,7 +41,7 @@ class OrganizationRouter(RegistryRouter):
         with cherrypy.request.db_session() as session:
             organization = session.query(Organization).filter(Organization.name == model.name).first()
             if organization is not None:
-                raise cherrypy.HTTPError(409, 'An organization with the request name already exists')
+                raise cherrypy.HTTPError(409, 'An organization with the requested name already exists')
 
             organization = Organization()
             organization.name = model.name
@@ -73,7 +74,7 @@ class OrganizationRouter(RegistryRouter):
         with cherrypy.request.db_session() as session:
             organization = session.query(Organization).filter(Organization.name == organization_name).first()
             if organization is None:
-                raise cherrypy.HTTPError(404, 'An organization with the request name does not exist.')
+                raise cherrypy.HTTPError(404, 'An organization with the requested name does not exist.')
 
         response = ResponseOrganization()
         response.name = organization.name
@@ -106,7 +107,6 @@ class OrganizationRouter(RegistryRouter):
                 except ValueError:
                     raise cherrypy.HTTPError(400, 'Invalid organization list marker')
                 marker: Organization = session.query(Organization).filter(Organization.id == marker_id).first()
-
                 if marker is None:
                     raise cherrypy.HTTPError(404, 'Unknown organization list marker')
 
@@ -153,8 +153,11 @@ class OrganizationRouter(RegistryRouter):
         with cherrypy.request.db_session() as session:
             organization = session.query(Organization).filter(Organization.name == organization_name).first()
             if organization is None:
-                raise cherrypy.HTTPError(404, 'An organization with the request name does not exist.')
+                raise cherrypy.HTTPError(404, 'An organization with the requested name does not exist.')
 
-            # TODO: if has modules prevent deletion
+            module = session.query(Module).filter(Module.organization_id == organization.id).scalar()
+            if module is not None:
+                raise cherrypy.HTTPError(404, 'Organization cannot be deleted while it has modules.')
+
             organization.delete()
             session.commit()

@@ -51,7 +51,7 @@ class RunRegistry(Command):
         parser.add_argument("--db-url", action=EnvDefault, envvar="DB_URL", default="sqlite:///hack/registry.db",
                             type=str, help="The URL to the database to connect to")
         parser.add_argument("--db-pool-size", action=EnvDefault, envvar="DB_POOL_SIZE", default=5, type=int,
-                            help="The amount of connects to make to the database")
+                            help="The amount of connections to make to the database")
 
     def run(self, args) -> int:
         if (hasattr(args, 'cert') is True and hasattr(args, 'key') is False) or \

@@ -2,7 +2,7 @@ import cherrypy
 from ingredients_http.route import Route
 
 from registry.http.router import RegistryRouter
-from registry.sql.models.module import Module, ModuleVersion
+from registry.sql.models.module import Module, ModuleProviderVersion, ModuleProvider
 from registry.sql.models.organization import Organization
 
 
@@ -27,10 +27,21 @@ class DownloadRouter(RegistryRouter):
             if module is None:
                 raise cherrypy.HTTPError(404, "The requested module could not be found")
 
-            version = session.query(ModuleVersion).filter(ModuleVersion.module_id == module.id).filter(
-                ModuleVersion.provider == provider).filter(ModuleVersion.version == version).first()
+            provider: ModuleProvider = session.query(ModuleProvider).filter(
+                ModuleProvider.module_id == module.id).filter(ModuleProvider.name == provider).first()
+            if provider is None:
+                raise cherrypy.HTTPError(404, "The requested provider could not be found")
+
+            version = session.query(ModuleProviderVersion).filter(ModuleProviderVersion.provider_id == provider.id) \
+                .filter(ModuleProviderVersion.version == version).first()
 
             if version is None:
                 raise cherrypy.HTTPError(404, "The requested module version could not be found")
 
-            cherrypy.response.headers['X-Terraform-Get'] = ''  # TODO: generate pre-signed url
+            # We are going to assume the module is tar.gz
+            # other types will not be supported
+            # Supporting multiple formats is hard
+            # Terraform enterprise only supports tar.gz so that should be a safe assumption
+
+            cherrypy.response.headers[
+                'X-Terraform-Get'] = 'https://api.github.com/repos/hashicorp/terraform-aws-consul/tarball/v0.0.1//*?archive=tar.gz'  # TODO: generate pre-signed url

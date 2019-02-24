@@ -13,6 +13,7 @@ sqlalchemy-utils = ">=0.33.11"
 arrow = ">=0.13.1"
 apispec = ">=1.0.0"
 pyyaml = ">=3.10"
+semver = ">=2.8.1"
 
 [dev-packages]
 

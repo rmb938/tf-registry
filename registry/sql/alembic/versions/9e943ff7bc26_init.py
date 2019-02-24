@@ -30,7 +30,7 @@ def upgrade():
     op.create_table(
         'modules',
         sa.Column('id', sa_utils.UUIDType, primary_key=True),
-        sa.Column('organization_id', sa_utils.UUIDType, sa.ForeignKey('organizations.id'), nullable=False),
+        sa.Column('organization_id', sa_utils.UUIDType, sa.ForeignKey('organizations.id'), nullable=False, index=True),
         sa.Column('name', sa.String, nullable=False),
         sa.Column('created_at', sa_utils.ArrowType, index=True, nullable=False, server_default=sa.func.now()),
         sa.Column('updated_at', sa_utils.ArrowType, nullable=False, server_default=sa.func.now(),
@@ -39,25 +39,33 @@ def upgrade():
     op.create_index('organization_id_name_idx', 'modules', ['organization_id', 'name'], unique=True)
 
     op.create_table(
-        'module_versions',
+        'module_providers',
         sa.Column('id', sa_utils.UUIDType, primary_key=True),
-        sa.Column('module_id', sa_utils.UUIDType, sa.ForeignKey('modules.id'), nullable=False),
-        sa.Column('provider', sa.String, nullable=False),
+        sa.Column('module_id', sa.String, sa.ForeignKey('modules.id'), nullable=False, index=True),
+        sa.Column('name', sa.String, nullable=False),
+        sa.Column('created_at', sa_utils.ArrowType, index=True, nullable=False, server_default=sa.func.now()),
+        sa.Column('updated_at', sa_utils.ArrowType, nullable=False, server_default=sa.func.now(),
+                  onupdate=sa.func.now())
+    )
+    op.create_index('module_id_name_idx', 'module_providers', ['module_id', 'name'], unique=True)
+
+    op.create_table(
+        'module_provider_versions',
+        sa.Column('id', sa_utils.UUIDType, primary_key=True),
+        sa.Column('provider_id', sa.String, sa.ForeignKey('module_providers.id'), nullable=False, index=True),
         sa.Column('version', sa.String, nullable=False),
         sa.Column('created_at', sa_utils.ArrowType, index=True, nullable=False, server_default=sa.func.now()),
         sa.Column('updated_at', sa_utils.ArrowType, nullable=False, server_default=sa.func.now(),
                   onupdate=sa.func.now())
     )
-
-    op.create_index('module_id_provider_idx', 'module_versions', ['module_id', 'provider'], unique=True)
-    op.create_index('module_id_provider_version_idx', 'module_versions', ['module_id', 'provider', 'version'],
-                    unique=True)
+    op.create_index('provider_id_version_idx', 'module_provider_versions', ['provider_id', 'version'], unique=True)
 
 
 def downgrade():
-    op.drop_index('module_id_provider_idx', 'module_versions')
-    op.drop_index('module_id_provider_version_idx', 'module_versions')
-    op.drop_table('module_versions')
+    op.drop_index('module_id_name_idx', 'module_providers')
+    op.drop_table('module_providers')
+    op.drop_index('provider_id_version_idx', 'module_provider_versions')
+    op.drop_table('module_provider_versions')
     op.drop_index('organization_id_name_idx', 'modules')
     op.drop_table('modules')
     op.drop_table('organizations')

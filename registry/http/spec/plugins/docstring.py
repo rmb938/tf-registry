@@ -4,6 +4,7 @@ from apispec.yaml_utils import load_operations_from_docstring
 from schematics.contrib.enum_type import EnumType
 from schematics.models import FieldDescriptor
 from schematics.types import ModelType, DictType, ListType, BooleanType, EmailType, UUIDType, StringType, IntType
+from schematics.undefined import UndefinedType
 
 from registry.http.schematics.types import ArrowType, NameType
 
@@ -57,12 +58,15 @@ class DocStringPlugin(BasePlugin):
                         if '{' + key + '}' in path:
                             inn = 'path'
                         if isinstance(obj, FieldDescriptor):
-                            data['parameters'].append({
+                            paramenters = {
                                 'name': key,
                                 'in': inn,
                                 'required': model_cls._fields[key].required,
-                                'schema': parse_model_type(self.spec, model_cls._fields[key])
-                            })
+                                'schema': parse_model_type(self.spec, model_cls._fields[key]),
+                            }
+                            if isinstance(model_cls._fields[key]._default, UndefinedType) is False:
+                                paramenters['schema']['default'] = model_cls._fields[key]._default
+                            data['parameters'].append(paramenters)
 
                 if 'tools.model_out.cls' in cp_config:
                     model_cls = cp_config['tools.model_out.cls']

@@ -2,6 +2,7 @@ import arrow
 import arrow.parser
 from schematics.exceptions import ConversionError
 from schematics.types import StringType, BaseType
+from semver import VersionInfo
 
 
 class NameType(StringType):
@@ -24,3 +25,21 @@ class ArrowType(BaseType):
 
     def to_primitive(self, value, context=None):
         return value.isoformat()
+
+
+class SemVerType(BaseType):
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def to_native(self, value, context=None):
+        if not isinstance(value, VersionInfo):
+            try:
+                value = VersionInfo.parse(value)
+            except ValueError:
+                raise ConversionError('Could not parse %s as a SemVer string.' % value)
+
+        return value
+
+    def to_primitive(self, value, context=None):
+        return str(value)
