@@ -11,6 +11,8 @@ sqlalchemy = ">=1.2.18"
 alembic = ">=1.0.7"
 sqlalchemy-utils = ">=0.33.11"
 arrow = ">=0.13.1"
+apispec = ">=1.0.0"
+pyyaml = ">=3.10"
 
 [dev-packages]
 

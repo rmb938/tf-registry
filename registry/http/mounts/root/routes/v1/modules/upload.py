@@ -3,16 +3,15 @@ import hashlib
 import cherrypy
 from ingredients_http.request_methods import RequestMethods
 from ingredients_http.route import Route
-from ingredients_http.router import Router
 
-from registry.sql.models.module import Module
+from registry.http.router import RegistryRouter
+from registry.sql.models.module import Module, ModuleVersion
 from registry.sql.models.organization import Organization
-from registry.sql.models.version import Version
 
 ALLOWED_EXTENSIONS = ('.zip', '.tar.gz')
 
 
-class UploadRouter(Router):
+class UploadRouter(RegistryRouter):
 
     def __init__(self):
         super().__init__(uri_base="{organization_name}/{name}/{provider}/{version}/upload")
@@ -38,8 +37,8 @@ class UploadRouter(Router):
             if module is None:
                 raise cherrypy.HTTPError(404, "The requested module could not be found")
 
-            version = session.query(Version).filter(Version.module_id == module.id).filter(
-                Version.provider == provider).filter(Version.version == version).first()
+            version = session.query(ModuleVersion).filter(ModuleVersion.module_id == module.id).filter(
+                ModuleVersion.provider == provider).filter(ModuleVersion.version == version).first()
 
             if version is None:
                 raise cherrypy.HTTPError(404, "The requested module version could not be found")

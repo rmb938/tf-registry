@@ -1,23 +1,17 @@
 from typing import List
 
 import cherrypy
-from ingredients_http.request_methods import RequestMethods
 from ingredients_http.route import Route
-from ingredients_http.router import Router
 
-from registry.sql.models.module import Module
+from registry.http.router import RegistryRouter
+from registry.sql.models.module import Module, ModuleVersion
 from registry.sql.models.organization import Organization
-from registry.sql.models.version import Version
 
 
-class VersionsRouter(Router):
+class VersionsRouter(RegistryRouter):
 
     def __init__(self):
         super().__init__(uri_base="{organization_name}/{name}/{provider}/versions")
-
-    @Route(methods=[RequestMethods.POST])
-    def create(self, namespace, name, provider):
-        pass
 
     @Route()
     @cherrypy.tools.json_out()
@@ -37,8 +31,9 @@ class VersionsRouter(Router):
                 raise cherrypy.HTTPError(404, "The requested module could not be found")
 
             output_versions = []
-            versions: List[Version] = session.query(Version).filter(Version.module_id == module.id).filter(
-                Version.provider == provider)
+            versions: List[ModuleVersion] = session.query(ModuleVersion).filter(
+                ModuleVersion.module_id == module.id).filter(
+                ModuleVersion.provider == provider)
             for version in versions:
                 output_versions.append({
                     "version": version.version  # TODO: root dependencies and providers list, sub modules, ect...

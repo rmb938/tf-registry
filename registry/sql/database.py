@@ -1,14 +1,11 @@
 from contextlib import contextmanager
 
-from sqlalchemy import create_engine, BigInteger
-from sqlalchemy.dialects import sqlite
+from sqlalchemy import create_engine
 from sqlalchemy.engine.url import make_url
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, scoped_session
 
 Base = declarative_base()
-BigIntegerType = BigInteger()
-BigIntegerType = BigIntegerType.with_variant(sqlite.INTEGER(), 'sqlite')
 
 
 class Database(object):
