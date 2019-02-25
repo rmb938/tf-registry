@@ -67,3 +67,7 @@ The API has a fully documented swagger spec. Simply visit `/swagger/ui` on your 
     * testing all the things is very important
 - [ ] Docker Image and Quick Start
     * create a docker image and quickstart for a fast local demo
+- [ ] CLI
+    * https://github.com/rmb938/tf-registry-cli
+- [ ] Terraform Provider
+    * https://github.com/rmb938/terraform-provider-tfregistry
