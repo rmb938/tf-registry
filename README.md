@@ -18,7 +18,7 @@ Implementation of the Terraform Module Registry
 
 Simply deploy the newer version of tf-registry. 
 
-Since database migrations are automatically ran on startup it is recommenced
+Since database migrations are automatically run on startup it is recommended
 to upgrade one version at a time.
 
 
