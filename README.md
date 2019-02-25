@@ -59,7 +59,7 @@ The API has a fully documented swagger spec. Simply visit `/swagger/ui` on your 
 # TODO
 
 - [X] Storage
-    * Currently there is no way to upload/download modules
+    * ~~Currently there is no way to upload/download modules~~
 - [ ] Authentication and Authorization
     * Use OpenID OAuth 
 - [ ] Testing and CI
