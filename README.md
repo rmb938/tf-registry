@@ -47,6 +47,8 @@ The API has a fully documented swagger spec. Simply visit `/swagger/ui` on your 
 1. Run `make local`
     * This will launch the python application with an SQLite database
 1. Navigate to `http://127.0.0.1:8080/swagger/ui`
+1. Before running terraform set the `TERRAFORM_CONFIG` environment variable to `hack/.terraformrc`
+    * `export TERRAFORM_CONFIG=$(pwd)/hack/.terraformrc`
 
 ## Cleanup
 
@@ -57,5 +59,11 @@ The API has a fully documented swagger spec. Simply visit `/swagger/ui` on your 
 
 # TODO
 
+- [ ] Storage
+    * Currently there is no way to upload/download modules
 - [ ] Authentication and Authorization
     * Use OpenID OAuth 
+- [ ] Testing and CI
+    * testing all the things is very important
+- [ ] Docker Image and Quick Start
+    * create a docker image and quickstart for a fast local demo
