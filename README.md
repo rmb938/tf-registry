@@ -53,13 +53,12 @@ The API has a fully documented swagger spec. Simply visit `/swagger/ui` on your 
 ## Cleanup
 
 1. Stop the python application
-1. Stop the minio container
 1. Run `make clean`
  
 
 # TODO
 
-- [ ] Storage
+- [X] Storage
     * Currently there is no way to upload/download modules
 - [ ] Authentication and Authorization
     * Use OpenID OAuth 

@@ -1,4 +1,5 @@
 import base64
+import datetime
 import uuid
 from typing import List
 
@@ -8,7 +9,7 @@ from ingredients_http.route import Route
 from sqlalchemy import desc
 
 from registry.http.mounts.root.routes.api.v1.modules.validation_models.versions import ParamsCreateVersion, \
-    ParamsVersion, ParamsListVersion, RequestCreateVersion, ResponseVersion
+    ParamsVersion, ParamsListVersion, RequestCreateVersion, ResponseVersion, ResponseCreateVersion
 from registry.http.router import RegistryRouter
 from registry.sql.models.module import Module, ModuleProvider, ModuleProviderVersion
 from registry.sql.models.organization import Organization
@@ -20,9 +21,10 @@ class ModuleProviderVersionRouter(RegistryRouter):
 
     @Route(methods=[RequestMethods.POST])
     @cherrypy.tools.db_session()
+    @cherrypy.tools.s3_client()
     @cherrypy.tools.model_params(cls=ParamsCreateVersion)
     @cherrypy.tools.model_in(cls=RequestCreateVersion)
-    @cherrypy.tools.model_out(cls=ResponseVersion)
+    @cherrypy.tools.model_out(cls=ResponseCreateVersion)
     def create(self, organization_name, module_name, provider_name):
         """Create a Version
         ---
@@ -68,8 +70,17 @@ class ModuleProviderVersionRouter(RegistryRouter):
             session.commit()
             session.refresh(version)
 
-        response = ResponseVersion()
+        s3_client = cherrypy.request.s3_client
+
+        put_object_url = s3_client.generate_presigned_url(
+            ClientMethod='put_object',
+            Params={'Bucket': self.mount.s3_bucket, 'Key': str(version.id)},
+            ExpiresIn=datetime.timedelta(minutes=5).seconds
+        )
+
+        response = ResponseCreateVersion()
         response.version = version.version
+        response.upload_url = put_object_url
         response.created_at = version.created_at
         response.updated_at = version.updated_at
 

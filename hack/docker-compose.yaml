@@ -1,7 +1,7 @@
 version: '2'
 
 services:
-  minio1:
+  minio:
     image: minio/minio
     volumes:
       - minio:/export
@@ -11,6 +11,16 @@ services:
       MINIO_ACCESS_KEY: Z4DCGH3MOP1N1GVO9146
       MINIO_SECRET_KEY: EB5gj1VgmfmRGfnSfcM06ZPG5ah9FB9DsUEISRi0
     command: server /export
+  createbucket:
+    image: minio/mc
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+        /usr/bin/mc config host add minio http://minio:9000 Z4DCGH3MOP1N1GVO9146 EB5gj1VgmfmRGfnSfcM06ZPG5ah9FB9DsUEISRi0;
+        /usr/bin/mc mb -p minio/local;
+        exit 0;
+      "
 
 
 ## By default this config uses default local driver,

@@ -1,5 +1,5 @@
 from schematics import Model
-from schematics.types import StringType, IntType
+from schematics.types import StringType, IntType, URLType
 
 from registry.http.schematics.types import NameType, SemVerType, ArrowType
 
@@ -33,3 +33,7 @@ class ResponseVersion(Model):
     version = SemVerType(required=True)
     created_at = ArrowType(required=True)
     updated_at = ArrowType(required=True)
+
+
+class ResponseCreateVersion(ResponseVersion):
+    upload_url = URLType(required=True)

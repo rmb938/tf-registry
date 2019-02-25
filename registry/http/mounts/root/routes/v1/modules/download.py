@@ -1,3 +1,5 @@
+import datetime
+
 import cherrypy
 from ingredients_http.route import Route
 
@@ -13,6 +15,7 @@ class DownloadRouter(RegistryRouter):
 
     @Route()
     @cherrypy.tools.db_session()
+    @cherrypy.tools.s3_client()
     def download(self, organization_name, name, provider, version):
         with cherrypy.request.db_session() as session:
             organization: Organization = session.query(Organization).filter(
@@ -43,5 +46,12 @@ class DownloadRouter(RegistryRouter):
             # Supporting multiple formats is hard
             # Terraform enterprise only supports tar.gz so that should be a safe assumption
 
-            cherrypy.response.headers[
-                'X-Terraform-Get'] = 'https://api.github.com/repos/hashicorp/terraform-aws-consul/tarball/v0.0.1//*?archive=tar.gz'  # TODO: generate pre-signed url
+            s3_client = cherrypy.request.s3_client
+            get_object_url = s3_client.generate_presigned_url(
+                ClientMethod='get_object',
+                Params={'Bucket': self.mount.s3_bucket, 'Key': str(version.id),
+                        'ResponseContentDisposition': 'attachment;filename=' + organization.name + '-' + module.name + '-' + provider.name + '-' + version.version + '.tar.gz'},
+                ExpiresIn=datetime.timedelta(minutes=5).seconds
+            )
+
+            cherrypy.response.headers['X-Terraform-Get'] = get_object_url + '&archive=tar.gz'
